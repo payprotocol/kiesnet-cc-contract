@@ -125,7 +125,7 @@ func contractList(stub shim.ChaincodeStubInterface, params []string) peer.Respon
 
 // params[0] : document (JSON string)
 // params[1] : expiry (duration represented by int64 seconds, multi-sig only)
-// params[2:] : signers' KID (exclude invoker, max 128)
+// params[2:] : signers' KID (exclude invoker, max 127)
 func contractNew(stub shim.ChaincodeStubInterface, params []string) peer.Response {
 	ccid, err := ccid.GetID(stub)
 	if err != nil || "kiesnet-contract" == ccid || "kiesnet-cc-contract" == ccid {
