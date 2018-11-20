@@ -1,0 +1,16 @@
+{
+   "index": {
+      "fields": [
+         "sign.signer"
+      ],
+      "partial_filter_selector": {
+         "$or":[
+            {"sign.approved_time":{"$exists":true}},
+            {"sign.disapproved_time":{"$exists":true}}
+         ]
+      }
+   },
+   "ddoc": "contract",
+   "name": "signed",
+   "type": "json"
+}

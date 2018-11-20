@@ -117,10 +117,43 @@ func contractGet(stub shim.ChaincodeStubInterface, params []string) peer.Respons
 	return shim.Success(data)
 }
 
-// params[0] : ....
-// params[1] : ....
+// params[0] : stateCriteria (all, unsigned, signed)
+// unsigned : 서멍해야 하는거 (서명 못하는 상태는 뺌)
+// signed : 서명한 것 (상태가 어떻든 보여줌)
+// params[1] : bookmark
+//TODO ccid : 없으면 전체
+//XXX lifetimeCriteria (all, pending, expired, executed, canceled)
+//XXX creator : 의미없음
+//TODO sort : created_time, update_time, executed_time,
 func contractList(stub shim.ChaincodeStubInterface, params []string) peer.Response {
-	return shim.Success([]byte("list"))
+	// authentication
+	kid, err := kid.GetID(stub, false)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	stateCriteria := "all"
+	if len(params) > 0 {
+		stateCriteria = params[0]
+	}
+	bookmark := ""
+	if len(params) > 1 {
+		bookmark = params[1]
+	}
+
+	cb := NewContractStub(stub)
+	res, err := cb.GetQueryContractsResult(kid, stateCriteria, bookmark)
+	if err != nil {
+		logger.Debug(err.Error())
+		return shim.Error("failed to get account addresses list")
+	}
+
+	data, err := json.Marshal(res)
+	if err != nil {
+		logger.Debug(err.Error())
+		return shim.Error("failed to marshal account addresses list")
+	}
+	return shim.Success(data)
 }
 
 // params[0] : document (JSON string)

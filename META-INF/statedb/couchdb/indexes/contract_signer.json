@@ -1,0 +1,11 @@
+{
+    "index": {
+       "fields": [
+          "sign.signer"
+       ]
+    },
+    "ddoc": "contract",
+    "name": "signer",
+    "type": "json"
+ }
+ 

@@ -15,6 +15,9 @@ import (
 	"golang.org/x/crypto/sha3"
 )
 
+// ContractsFetchSize _
+const ContractsFetchSize = 20
+
 // ContractStub _
 type ContractStub struct {
 	stub shim.ChaincodeStubInterface
@@ -108,6 +111,32 @@ func (cb *ContractStub) GetContract(id, signer string) (*Contract, error) {
 		return contract, nil
 	}
 	return nil, NotExistedContractError{id, signer}
+}
+
+// GetQueryContractsResult _
+func (cb *ContractStub) GetQueryContractsResult(kid, stateCriteria, bookmark string) (*QueryResult, error) {
+	query := ""
+	switch stateCriteria {
+	case "all":
+		query = CreateQueryContractsBySigner(kid)
+	case "signed":
+		query = CreateQueryContractsSigned(kid)
+	case "unsigned":
+		ts, err := txtime.GetTime(cb.stub)
+		if err != nil {
+			return nil, err
+		}
+		query, err = CreateQueryContractsUnsigned(kid, ts)
+		if err != nil {
+			return nil, err
+		}
+	}
+	iter, meta, err := cb.stub.GetQueryResultWithPagination(query, ContractsFetchSize, bookmark)
+	if err != nil {
+		return nil, err
+	}
+	defer iter.Close()
+	return NewQueryResult(meta, iter)
 }
 
 // PutContract _
