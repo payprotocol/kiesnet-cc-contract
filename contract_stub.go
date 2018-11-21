@@ -77,7 +77,7 @@ func (cb *ContractStub) CreateContracts(creator, ccid, document string, signers 
 			ApprovedCount: 1,
 			CCID:          ccid,
 			Document:      document,
-			CanceledTime:  ts,
+			CreatedTime:   ts,
 			UpdatedTime:   ts,
 			ExpiryTime:    &expTime,
 			Sign:          sign,
