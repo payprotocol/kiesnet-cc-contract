@@ -4,7 +4,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"strconv"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
@@ -118,65 +117,47 @@ func contractGet(stub shim.ChaincodeStubInterface, params []string) peer.Respons
 	return shim.Success(data)
 }
 
-// params[0] : ccid
-// params[1] : option ()
-// params[2] : pageSize
-// params[3] : bookmark
+// params[0] : option ()
+// params[1] : bookmark
 func contractList(stub shim.ChaincodeStubInterface, params []string) peer.Response {
 	/*
 		1. My(stub->kid) all contracts
-		2. My unsigned contrats
-		3. My 사인할 필요 없는거  contracts
-		4. My canceled contracts
-		5. My multisig contracts
+		2. need to get a sign
+			2.1 ApprovedTime : false && disapporve : false
+			2.2 expiredtime < now
+			2.3 executed_time && canceled time => partial
+		3. My 사인할 필요 없는거  contracts - 이미 처리됨
+			3.1 Approvedtime - true || disapprovTime - true
+			3.3 executed_time || canceled time => partial - exitst
 		## Sign.signer = kid
-		## ccid check
+		## ccid check -> partial -> X : 매번 ccid가 바뀔수 있으므로...
+		TODO:
+		1) Pagesize handling
+			ASIS : declare const value
+		2) ccid handling
+			ASIS : exact case search
+		3) index
+		4) ordering
 	*/
-	if len(params) < 4 {
-		shim.Error("incorrect number of parameters. expecting 4+")
+	if len(params) < 2 {
+		shim.Error("incorrect number of parameters. expecting 2")
 	}
-	ccid := params[0]
-	if "" == ccid {
-		return shim.Error("incorrect ccid")
-	}
-	option := params[1]
+	option := params[0]
 	if "" == option {
 		return shim.Error("incorrect coption")
 	}
-	p, err := strconv.ParseInt(params[2], 10, 32)
+	// p, err := strconv.ParseInt(params[1], 10, 32)
+	// if nil != err {
+	// 	return shim.Error(err.Error())
+	// }
+	b := params[1]
+	cb := NewContractStub(stub)
+	res, err := cb.GetContractList(option, b)
 	if nil != err {
 		return shim.Error(err.Error())
 	}
-	b := params[3]
 
-	kid, err := kid.GetID(stub, false)
-	if nil != err {
-		return shim.Error(err.Error())
-	}
-
-	query := CreateQueryAllContractsByKID(kid)
-	iter, meta, err := stub.GetQueryResultWithPagination(query, int32(p), b)
-	if nil != err {
-		return shim.Error(err.Error())
-	}
-	defer iter.Close()
-	if meta.GetFetchedRecordsCount() == 0 {
-		return shim.Success([]byte("No more item"))
-	}
-	fmt.Println(meta.GetBookmark())
-	for iter.HasNext() {
-		kv, err := iter.Next()
-		if nil != err {
-			return shim.Error(err.Error())
-		}
-
-		fmt.Println(kv.String())
-
-	}
-	fmt.Println("######")
-
-	// JSON array
-	return shim.Success([]byte("list"))
+	return response(res)
 }
 
 // params[0] : document (JSON string)

@@ -1,0 +1,34 @@
+{
+    "index": {
+        "partial_filter_selector": {
+            "$or":[
+                {
+                    "sign.approved_time":{
+                        "$exists": true
+                    }
+                },
+                {
+                    "sign.disapproved_time":{
+                        "$exists": true
+                    }
+                },
+                {
+                    "executed_time":{
+                        "$exists": true
+                    }
+                },
+                {
+                    "canceled_time":{
+                        "$exists": true
+                    }
+                }
+            ]
+        },
+        "fields": [
+            "sign.signer", "ccid"
+        ]
+    },
+    "ddoc": "contract_list",
+    "name": "contract_fin",
+    "type": "json"
+}

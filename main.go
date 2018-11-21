@@ -45,6 +45,15 @@ func ver(stub shim.ChaincodeStubInterface, params []string) peer.Response {
 	return shim.Success([]byte("Kiesnet Contract v1.0 created by Key Inside Co., Ltd."))
 }
 
+func response(payload Payload) peer.Response {
+	data, err := payload.MarshalPayload()
+	if err != nil {
+		logger.Debug(err.Error())
+		return shim.Error("failed to marshal payload")
+	}
+	return shim.Success(data)
+}
+
 func main() {
 	if err := shim.Start(new(Chaincode)); err != nil {
 		logger.Criticalf("failed to start chaincode: %s", err)

@@ -2,7 +2,9 @@
 
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 // QueryContractsByID _
 const QueryContractsByID = `{
@@ -17,29 +19,89 @@ func CreateQueryContractsByID(id string) string {
 	return fmt.Sprintf(QueryContractsByID, id)
 }
 
-// QueryAllContractsByKID _
-const QueryAllContractsByKID = `{
-	"selector": {
-		"sign.signer":"%s"
-	}
-}`
-
-//CreateQueryAllContractsByKID _
-func CreateQueryAllContractsByKID(kid string) string {
-	return fmt.Sprintf(QueryAllContractsByKID, kid)
-}
-
-// QueryContractsNeedSign _
-const QueryContractsNeedSign = `{
+// QueryAllContracts _
+const QueryAllContracts = `{
 	"selector": {
 		"sign.signer":"%s",
-		"$exists":{
-			"sign.ApprovedTime": false
-		}
-	}
+		"ccid": "%s"
+	},
+	"use_index": ["contract_list", "contract_all"]
 }`
 
-//CreateQueryContractsNeedSign _
-func CreateQueryContractsNeedSign(kid string) string {
-	return fmt.Sprintf(QueryContractsNeedSign, kid)
+// CreateQueryAllContracts _
+func CreateQueryAllContracts(kid string, ccid string) string {
+	return fmt.Sprintf(QueryAllContracts, kid, ccid)
+}
+
+// QueryAwaitContracts _
+const QueryAwaitContracts = `{
+	"selector": {
+		"sign.signer": "%s",
+		"ccid": "%s",
+		"expiry_time": {
+			"$gt": "%s"
+		},
+		"$and":[
+			{
+				"sign.approved_time":{
+					"$exists": false
+				}
+			},{
+				"sign.disapproved_time":{
+					"$exists": false
+				}
+			},{
+				"executed_time": {
+					"$exists": false
+				}
+			},
+			{
+				"canceled_time": {
+					"$exists": false
+				}
+			}
+		]
+	}, 
+	"use_index":["contract_list", "contract_awaiter"]
+}`
+
+// CreateQueryAwaitContracts _
+func CreateQueryAwaitContracts(kid string, ccid string, t string) string {
+	return fmt.Sprintf(QueryAwaitContracts, kid, ccid, t)
+}
+
+// QueryFinContracts _
+const QueryFinContracts = `{
+	"selector": {
+		"sign.signer": "%s",
+		"ccid": "%s",
+		"$or":[
+			{
+				"sign.approved_time":{
+					"$exists": true
+				}
+			},
+			{
+				"sign.disapproved_time":{
+					"$exists": true
+				}
+			},
+			{
+				"executed_time":{
+					"$exists": true
+				}
+			},
+			{
+				"canceled_time":{
+					"$exists": true
+				}
+			}
+		]
+	}, 
+	"use_index":["contract_list", "contract_fin"]
+}`
+
+// CreateQueryFinContracts _
+func CreateQueryFinContracts(kid string, ccid string) string {
+	return fmt.Sprintf(QueryFinContracts, kid, ccid)
 }

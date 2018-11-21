@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
+	"github.com/key-inside/kiesnet-ccpkg/ccid"
+	"github.com/key-inside/kiesnet-ccpkg/kid"
 	"github.com/key-inside/kiesnet-ccpkg/stringset"
 	"github.com/key-inside/kiesnet-ccpkg/txtime"
 	"github.com/pkg/errors"
@@ -202,4 +204,48 @@ func (cb *ContractStub) UpdateContracts(updater *Contract) error {
 	}
 
 	return nil
+}
+
+// ContractListFetchSize _
+const ContractListFetchSize = 5
+
+// GetContractList  _
+func (cb *ContractStub) GetContractList(option, bookmark string) (*QueryResult, error) {
+	kid, err := kid.GetID(cb.stub, false)
+	if nil != err {
+		return nil, err
+	}
+	ccid, err := ccid.GetID(cb.stub)
+	if nil != err {
+		return nil, err
+	}
+	query := ""
+	switch option {
+	case "all":
+		query = CreateQueryAllContracts(kid, ccid)
+	case "awaiter":
+		ts, err := txtime.GetTime(cb.stub)
+		if nil != err {
+			return nil, err
+		}
+		t := ts.Format(time.RFC3339)
+		query = CreateQueryAwaitContracts(kid, ccid, t)
+	case "fin":
+		query = CreateQueryFinContracts(kid, ccid)
+	}
+
+	iter, meta, err := cb.stub.GetQueryResultWithPagination(query, ContractListFetchSize, bookmark)
+	if nil != err {
+		return nil, err
+	}
+	// Issue... Handling custom error or normal case
+	if meta.GetFetchedRecordsCount() == 0 {
+		return nil, NoFetchRecordsCountError{}
+	}
+	defer iter.Close()
+	result, err := NewQueryResult(meta, iter)
+	if nil != err {
+		return nil, err
+	}
+	return result, nil
 }
