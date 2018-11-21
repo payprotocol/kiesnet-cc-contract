@@ -16,3 +16,30 @@ const QueryContractsByID = `{
 func CreateQueryContractsByID(id string) string {
 	return fmt.Sprintf(QueryContractsByID, id)
 }
+
+// QueryAllContractsByKID _
+const QueryAllContractsByKID = `{
+	"selector": {
+		"sign.signer":"%s"
+	}
+}`
+
+//CreateQueryAllContractsByKID _
+func CreateQueryAllContractsByKID(kid string) string {
+	return fmt.Sprintf(QueryAllContractsByKID, kid)
+}
+
+// QueryContractsNeedSign _
+const QueryContractsNeedSign = `{
+	"selector": {
+		"sign.signer":"%s",
+		"$exists":{
+			"sign.ApprovedTime": false
+		}
+	}
+}`
+
+//CreateQueryContractsNeedSign _
+func CreateQueryContractsNeedSign(kid string) string {
+	return fmt.Sprintf(QueryContractsNeedSign, kid)
+}

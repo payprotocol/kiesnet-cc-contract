@@ -4,6 +4,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
@@ -117,9 +118,64 @@ func contractGet(stub shim.ChaincodeStubInterface, params []string) peer.Respons
 	return shim.Success(data)
 }
 
-// params[0] : ....
-// params[1] : ....
+// params[0] : ccid
+// params[1] : option ()
+// params[2] : pageSize
+// params[3] : bookmark
 func contractList(stub shim.ChaincodeStubInterface, params []string) peer.Response {
+	/*
+		1. My(stub->kid) all contracts
+		2. My unsigned contrats
+		3. My 사인할 필요 없는거  contracts
+		4. My canceled contracts
+		5. My multisig contracts
+		## Sign.signer = kid
+		## ccid check
+	*/
+	if len(params) < 4 {
+		shim.Error("incorrect number of parameters. expecting 4+")
+	}
+	ccid := params[0]
+	if "" == ccid {
+		return shim.Error("incorrect ccid")
+	}
+	option := params[1]
+	if "" == option {
+		return shim.Error("incorrect coption")
+	}
+	p, err := strconv.ParseInt(params[2], 10, 32)
+	if nil != err {
+		return shim.Error(err.Error())
+	}
+	b := params[3]
+
+	kid, err := kid.GetID(stub, false)
+	if nil != err {
+		return shim.Error(err.Error())
+	}
+
+	query := CreateQueryAllContractsByKID(kid)
+	iter, meta, err := stub.GetQueryResultWithPagination(query, int32(p), b)
+	if nil != err {
+		return shim.Error(err.Error())
+	}
+	defer iter.Close()
+	if meta.GetFetchedRecordsCount() == 0 {
+		return shim.Success([]byte("No more item"))
+	}
+	fmt.Println(meta.GetBookmark())
+	for iter.HasNext() {
+		kv, err := iter.Next()
+		if nil != err {
+			return shim.Error(err.Error())
+		}
+
+		fmt.Println(kv.String())
+
+	}
+	fmt.Println("######")
+
+	// JSON array
 	return shim.Success([]byte("list"))
 }
 
@@ -128,9 +184,9 @@ func contractList(stub shim.ChaincodeStubInterface, params []string) peer.Respon
 // params[2:] : signers' KID (exclude invoker, max 127)
 func contractNew(stub shim.ChaincodeStubInterface, params []string) peer.Response {
 	ccid, err := ccid.GetID(stub)
-	if err != nil || "kiesnet-contract" == ccid || "kiesnet-cc-contract" == ccid {
-		return shim.Error("invalid access")
-	}
+	// if err != nil || "kiesnet-contract" == ccid || "kiesnet-cc-contract" == ccid {
+	// 	return shim.Error("invalid access")
+	// }
 
 	if len(params) < 3 {
 		return shim.Error("incorrect number of parameters. expecting 3+")
