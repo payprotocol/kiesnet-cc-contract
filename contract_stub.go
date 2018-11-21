@@ -135,6 +135,7 @@ func (cb *ContractStub) ApproveContract(contract *Contract) (*Contract, error) {
 	}
 
 	contract.Sign.ApprovedTime = ts
+	contract.UpdatedTime = ts
 	contract.ApprovedCount++
 	if contract.SignersCount == contract.ApprovedCount {
 		contract.ExecutedTime = ts
@@ -160,6 +161,7 @@ func (cb *ContractStub) DisapproveContract(contract *Contract) (*Contract, error
 	}
 
 	contract.Sign.DisapprovedTime = ts
+	contract.UpdatedTime = ts
 	contract.CanceledTime = ts
 
 	// update all other signers
