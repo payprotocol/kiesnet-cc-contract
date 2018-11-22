@@ -232,8 +232,8 @@ func (cb *ContractStub) GetContractList(option, bookmark string) (*QueryResult, 
 		query = CreateQueryAwaitContracts(kid, ccid, t)
 	case "fin":
 		query = CreateQueryFinContracts(kid, ccid)
-	case "expired":
-		query = CreateQueryExpiredContracts(kid, ccid, t)
+	case "expiry":
+		query = CreateQueryexpiryContracts(kid, ccid, t)
 	}
 
 	iter, meta, err := cb.stub.GetQueryResultWithPagination(query, ContractListFetchSize, bookmark)

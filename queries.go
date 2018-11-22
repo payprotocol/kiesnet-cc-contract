@@ -106,8 +106,8 @@ func CreateQueryFinContracts(kid string, ccid string) string {
 	return fmt.Sprintf(QueryFinContracts, kid, ccid)
 }
 
-// QueryExpiredContracts _
-const QueryExpiredContracts = `{
+// QueryexpiryContracts _
+const QueryexpiryContracts = `{
 	"selector": {
 		"sign.signer": "%s",
 		"ccid": "%s",
@@ -118,7 +118,7 @@ const QueryExpiredContracts = `{
 	"use_index":["contract_list", "contract_expiry"]
 }`
 
-// CreateQueryExpiredContracts _
-func CreateQueryExpiredContracts(kid, ccid, t string) string {
-	return fmt.Sprintf(QueryExpiredContracts, kid, ccid, t)
+// CreateQueryexpiryContracts _
+func CreateQueryexpiryContracts(kid, ccid, t string) string {
+	return fmt.Sprintf(QueryexpiryContracts, kid, ccid, t)
 }
