@@ -3,12 +3,12 @@
         "partial_filter_selector": {
             "$and": [
                 {
-                    "executed_time": {
+                    "sign.approved_time": {
                         "$exists": false
                     }
                 },
                 {
-                    "canceled_time": {
+                    "sign.disapproved_time": {
                         "$exists": false
                     }
                 },{
