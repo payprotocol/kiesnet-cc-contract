@@ -220,18 +220,20 @@ func (cb *ContractStub) GetContractList(option, bookmark string) (*QueryResult, 
 		return nil, err
 	}
 	query := ""
+	ts, err := txtime.GetTime(cb.stub)
+	if nil != err {
+		return nil, err
+	}
+	t := ts.Format(time.RFC3339)
 	switch option {
 	case "all":
 		query = CreateQueryAllContracts(kid, ccid)
 	case "awaiter":
-		ts, err := txtime.GetTime(cb.stub)
-		if nil != err {
-			return nil, err
-		}
-		t := ts.Format(time.RFC3339)
 		query = CreateQueryAwaitContracts(kid, ccid, t)
 	case "fin":
 		query = CreateQueryFinContracts(kid, ccid)
+	case "expired":
+		query = CreateQueryExpiredContracts(kid, ccid, t)
 	}
 
 	iter, meta, err := cb.stub.GetQueryResultWithPagination(query, ContractListFetchSize, bookmark)
