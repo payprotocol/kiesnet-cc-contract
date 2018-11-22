@@ -11,7 +11,8 @@
                     "sign.disapproved_time": {
                         "$exists": false
                     }
-                },{
+                },
+                {
                     "executed_time": {
                         "$exists": false
                     }
@@ -24,10 +25,18 @@
             ]
         },
         "fields": [
-            "sign.signer", "ccid", "expiry_time"
+            {
+                "sign.signer": "desc"
+            },
+            {
+                "ccid": "desc"
+            },
+            {
+                "expiry_time": "desc"
+            }
         ]
     },
     "ddoc": "contract_list",
-    "name": "contract_awaiter",
+    "name": "contract_awaiter_urgent",
     "type": "json"
 }

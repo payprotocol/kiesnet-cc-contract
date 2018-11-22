@@ -33,6 +33,111 @@ func CreateQueryAllContracts(kid string, ccid string) string {
 	return fmt.Sprintf(QueryAllContracts, kid, ccid)
 }
 
+// QueryAwaitUrgentContracts _
+const QueryAwaitUrgentContracts = `{
+	"selector": {
+		"sign.signer": "%s",
+		"ccid": "%s",
+		"expiry_time": {
+			"$gt": "%s"
+		},
+		"$and":[
+			{
+				"sign.approved_time":{
+					"$exists": false
+				}
+			},{
+				"sign.disapproved_time":{
+					"$exists": false
+				}
+			},{
+				"executed_time": {
+					"$exists": false
+				}
+			},
+			{
+				"canceled_time": {
+					"$exists": false
+				}
+			}
+		]
+	},
+	"sort": [
+	   {
+		  "sign.signer": "desc"
+	   },
+	   {
+		  "ccid": "desc"
+	   },
+	   {
+		  "expiry_time": "desc"
+	   }
+	],
+	"use_index": [
+	   "contract_list",
+	   "contract_awaiter_urgent"
+	]
+}`
+
+// CreateQueryAwaitUrgentContracts _
+func CreateQueryAwaitUrgentContracts(kid, ccid, t string) string {
+	return fmt.Sprintf(QueryAwaitUrgentContracts, kid, ccid, t)
+}
+
+// QueryAwaitOldestContracts _
+const QueryAwaitOldestContracts = `{
+	"selector": {
+		"sign.signer": "%s",
+		"ccid": "%s",
+		"expiry_time": {
+			"$gt": "%s"
+		},
+		"$and":[
+			{
+				"sign.approved_time":{
+					"$exists": false
+				}
+			},{
+				"sign.disapproved_time":{
+					"$exists": false
+				}
+			},{
+				"executed_time": {
+					"$exists": false
+				}
+			},
+			{
+				"canceled_time": {
+					"$exists": false
+				}
+			}
+		]
+	},
+	"sort": [
+	   {
+		  "sign.signer": "asc"
+	   },
+	   {
+		  "ccid": "asc"
+	   },
+	   {
+		   "expiray_time":"asc"
+	   },
+	   {
+		  "created_time": "asc"
+	   }
+	],
+	"use_index": [
+	   "contract_list",
+	   "contract_awaiter_oldest"
+	]
+}`
+
+// CreateQueryAwaitOldestContracts _
+func CreateQueryAwaitOldestContracts() {
+
+}
+
 // QueryAwaitContracts _
 const QueryAwaitContracts = `{
 	"selector": {

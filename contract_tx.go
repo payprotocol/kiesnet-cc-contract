@@ -117,18 +117,17 @@ func contractGet(stub shim.ChaincodeStubInterface, params []string) peer.Respons
 	return shim.Success(data)
 }
 
-// params[0] : option ()
-// params[1] : bookmark
+// params[0] : option
+// 1) await.urgency (order by expiry)
+// 2) await.oldest  (order by create)
+// 3) ongoing.brisk (order by update)
+// 4) ongoing.oldest(order by create)
+// 5) fin			(order by update)
+// 6) all 			(order by create)
+// params[1] : order direction (a or d) <ongoing>
+// params[2] : bookmark
 func contractList(stub shim.ChaincodeStubInterface, params []string) peer.Response {
 	/*
-		1. My(stub->kid) all contracts
-		2. need to get a sign
-			2.1 ApprovedTime : false && disapporve : false
-			2.2 expiredtime < now
-			2.3 executed_time && canceled time => partial
-		3. My 사인할 필요 없는거  contracts - 이미 처리됨
-			3.1 Approvedtime - true || disapprovTime - true
-			3.3 executed_time || canceled time => partial - exitst
 		## Sign.signer = kid
 		## ccid check -> partial -> X : 매번 ccid가 바뀔수 있으므로...
 		TODO:
@@ -136,23 +135,21 @@ func contractList(stub shim.ChaincodeStubInterface, params []string) peer.Respon
 			ASIS : declare const value
 		2) ccid handling
 			ASIS : exact case search
-		3) index
 		4) ordering
+			- 기준(updated_time) / 방향(2개)
 	*/
 	if len(params) < 2 {
 		shim.Error("incorrect number of parameters. expecting 2")
 	}
 	option := params[0]
-	if "" == option {
-		return shim.Error("incorrect coption")
-	}
+	order := params[1]
 	// p, err := strconv.ParseInt(params[1], 10, 32)
 	// if nil != err {
 	// 	return shim.Error(err.Error())
 	// }
-	b := params[1]
+	b := params[2]
 	cb := NewContractStub(stub)
-	res, err := cb.GetContractList(option, b)
+	res, err := cb.GetContractList(option, order, b)
 	if nil != err {
 		return shim.Error(err.Error())
 	}
