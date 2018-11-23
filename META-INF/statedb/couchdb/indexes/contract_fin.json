@@ -1,31 +1,66 @@
 {
     "index": {
         "partial_filter_selector": {
-            "$or":[
+            "$or": [
                 {
-                    "sign.approved_time":{
+                    "sign.approved_time": {
                         "$exists": true
                     }
                 },
                 {
-                    "sign.disapproved_time":{
+                    "sign.disapproved_time": {
                         "$exists": true
                     }
                 },
                 {
-                    "executed_time":{
+                    "executed_time": {
                         "$exists": true
                     }
                 },
                 {
-                    "canceled_time":{
+                    "canceled_time": {
                         "$exists": true
                     }
+                },
+                {
+                    "$and": [
+                        {
+                            "sign.approved_time": {
+                                "$exists": false
+                            }
+                        },
+                        {
+                            "sign.disapproved_time": {
+                                "$exists": false
+                            }
+                        },
+                        {
+                            "executed_time": {
+                                "$exists": false
+                            }
+                        },
+                        {
+                            "canceled_time": {
+                                "$exists": false
+                            }
+                        }
+                    ]
                 }
             ]
         },
         "fields": [
-            "sign.signer", "ccid"
+            {
+                "created_time": "desc"
+            },
+            {
+                "expiry_time": "desc"
+            },
+            {
+                "sign.signer": "desc"
+            },
+            {
+                "ccid": "desc"
+            }
         ]
     },
     "ddoc": "contract_list",

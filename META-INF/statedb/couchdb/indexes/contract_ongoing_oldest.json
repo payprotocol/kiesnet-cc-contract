@@ -3,16 +3,6 @@
         "partial_filter_selector": {
             "$and": [
                 {
-                    "sign.approved_time": {
-                        "$exists": false
-                    }
-                },
-                {
-                    "sign.disapproved_time": {
-                        "$exists": false
-                    }
-                },
-                {
                     "executed_time": {
                         "$exists": false
                     }
@@ -22,6 +12,18 @@
                         "$exists": false
                     }
                 }
+            ],
+            "$or": [
+                {
+                    "sign.approved_time": {
+                        "$exists": true
+                    }
+                },
+                {
+                    "sign.disapproved_time": {
+                        "$exists": true
+                    }
+                }
             ]
         },
         "fields": [
@@ -29,7 +31,7 @@
                 "created_time": "asc"
             },
             {
-                "expiry_time":"asc"
+                "expiry_time": "asc"
             },
             {
                 "sign.signer": "asc"
@@ -40,6 +42,6 @@
         ]
     },
     "ddoc": "contract_list",
-    "name": "contract_awaiter_oldest",
+    "name": "contract_ongoing_oldest",
     "type": "json"
 }

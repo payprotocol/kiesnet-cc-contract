@@ -6,7 +6,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
@@ -211,7 +210,7 @@ func (cb *ContractStub) UpdateContracts(updater *Contract) error {
 const ContractListFetchSize = 20
 
 // GetContractList  _
-func (cb *ContractStub) GetContractList(option, order, bookmark string) (*QueryResult, error) {
+func (cb *ContractStub) GetContractList(option, bookmark string) (*QueryResult, error) {
 	kid, err := kid.GetID(cb.stub, false)
 	if nil != err {
 		return nil, err
@@ -226,21 +225,21 @@ func (cb *ContractStub) GetContractList(option, order, bookmark string) (*QueryR
 		return nil, err
 	}
 	t := ts.Format(time.RFC3339)
-	opt := strings.Split(option, ".")
-	switch opt[0] {
+	switch option {
 	case "await.urgency":
 		query = CreateQueryAwaitUrgentContracts(kid, ccid, t)
 	case "await.oldest":
-		query = CreateQueryAwaitOldestContracts(kid, ccid)
-	case "awaiter": //
-		query = CreateQueryAwaitContracts(kid, ccid, t)
+		query = CreateQueryAwaitOldestContracts(kid, ccid, t)
+	case "ongoing.brisk":
+		query = CreateQueryOngoingBriskContracts(kid, ccid, t)
+	case "ongoing.oldest":
+		query = CreateQueryOngoingOldestContracts(kid, ccid, t)
 	case "fin":
-		query = CreateQueryFinContracts(kid, ccid)
-	case "expiry":
-		query = CreateQueryexpiryContracts(kid, ccid, t)
+		query = CreateQueryFinContracts(kid, ccid, t)
 	default:
-		return nil, errors.New("incorrect option")
+		query = CreateQueryAwaitUrgentContracts(kid, ccid, t)
 	}
+	fmt.Println(query)
 	// Bookmark - little bit different..too long
 	iter, meta, err := cb.stub.GetQueryResultWithPagination(query, ContractListFetchSize, bookmark)
 	if nil != err {

@@ -142,14 +142,13 @@ func contractList(stub shim.ChaincodeStubInterface, params []string) peer.Respon
 		shim.Error("incorrect number of parameters. expecting 2")
 	}
 	option := params[0]
-	order := params[1]
 	// p, err := strconv.ParseInt(params[1], 10, 32)
 	// if nil != err {
 	// 	return shim.Error(err.Error())
 	// }
-	b := params[2]
+	b := params[1]
 	cb := NewContractStub(stub)
-	res, err := cb.GetContractList(option, order, b)
+	res, err := cb.GetContractList(option, b)
 	if nil != err {
 		return shim.Error(err.Error())
 	}

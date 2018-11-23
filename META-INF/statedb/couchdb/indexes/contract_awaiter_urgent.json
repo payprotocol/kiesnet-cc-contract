@@ -26,13 +26,13 @@
         },
         "fields": [
             {
-                "sign.signer": "desc"
+                "expiry_time": "asc"
             },
             {
-                "ccid": "desc"
+                "sign.signer": "asc"
             },
             {
-                "expiry_time": "desc"
+                "ccid": "asc"
             }
         ]
     },

@@ -3,16 +3,6 @@
         "partial_filter_selector": {
             "$and": [
                 {
-                    "sign.approved_time": {
-                        "$exists": false
-                    }
-                },
-                {
-                    "sign.disapproved_time": {
-                        "$exists": false
-                    }
-                },
-                {
                     "executed_time": {
                         "$exists": false
                     }
@@ -22,24 +12,36 @@
                         "$exists": false
                     }
                 }
+            ],
+            "$or": [
+                {
+                    "sign.approved_time": {
+                        "$exists": true
+                    }
+                },
+                {
+                    "sign.disapproved_time": {
+                        "$exists": true
+                    }
+                }
             ]
         },
         "fields": [
             {
-                "created_time": "asc"
+                "updated_time": "desc"
             },
             {
-                "expiry_time":"asc"
+                "expiry_time": "desc"
             },
             {
-                "sign.signer": "asc"
+                "sign.signer": "desc"
             },
             {
-                "ccid": "asc"
+                "ccid": "desc"
             }
         ]
     },
     "ddoc": "contract_list",
-    "name": "contract_awaiter_oldest",
+    "name": "contract_ongoing_brisk",
     "type": "json"
 }

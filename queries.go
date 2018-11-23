@@ -33,111 +33,6 @@ func CreateQueryAllContracts(kid string, ccid string) string {
 	return fmt.Sprintf(QueryAllContracts, kid, ccid)
 }
 
-// QueryAwaitUrgentContracts _
-const QueryAwaitUrgentContracts = `{
-	"selector": {
-		"sign.signer": "%s",
-		"ccid": "%s",
-		"expiry_time": {
-			"$gt": "%s"
-		},
-		"$and":[
-			{
-				"sign.approved_time":{
-					"$exists": false
-				}
-			},{
-				"sign.disapproved_time":{
-					"$exists": false
-				}
-			},{
-				"executed_time": {
-					"$exists": false
-				}
-			},
-			{
-				"canceled_time": {
-					"$exists": false
-				}
-			}
-		]
-	},
-	"sort": [
-	   {
-		  "sign.signer": "desc"
-	   },
-	   {
-		  "ccid": "desc"
-	   },
-	   {
-		  "expiry_time": "desc"
-	   }
-	],
-	"use_index": [
-	   "contract_list",
-	   "contract_awaiter_urgent"
-	]
-}`
-
-// CreateQueryAwaitUrgentContracts _
-func CreateQueryAwaitUrgentContracts(kid, ccid, t string) string {
-	return fmt.Sprintf(QueryAwaitUrgentContracts, kid, ccid, t)
-}
-
-// QueryAwaitOldestContracts _
-const QueryAwaitOldestContracts = `{
-	"selector": {
-		"sign.signer": "%s",
-		"ccid": "%s",
-		"expiry_time": {
-			"$gt": "%s"
-		},
-		"$and":[
-			{
-				"sign.approved_time":{
-					"$exists": false
-				}
-			},{
-				"sign.disapproved_time":{
-					"$exists": false
-				}
-			},{
-				"executed_time": {
-					"$exists": false
-				}
-			},
-			{
-				"canceled_time": {
-					"$exists": false
-				}
-			}
-		]
-	},
-	"sort": [
-	   {
-		  "sign.signer": "asc"
-	   },
-	   {
-		  "ccid": "asc"
-	   },
-	   {
-		   "expiray_time":"asc"
-	   },
-	   {
-		  "created_time": "asc"
-	   }
-	],
-	"use_index": [
-	   "contract_list",
-	   "contract_awaiter_oldest"
-	]
-}`
-
-// CreateQueryAwaitOldestContracts _
-func CreateQueryAwaitOldestContracts() {
-
-}
-
 // QueryAwaitContracts _
 const QueryAwaitContracts = `{
 	"selector": {
@@ -166,64 +61,166 @@ const QueryAwaitContracts = `{
 				}
 			}
 		]
-	}, 
-	"use_index":["contract_list", "contract_awaiter"]
+	}, %s
 }`
 
-// CreateQueryAwaitContracts _
-func CreateQueryAwaitContracts(kid string, ccid string, t string) string {
-	return fmt.Sprintf(QueryAwaitContracts, kid, ccid, t)
+// ConditionAwaitUrgentContracts _
+const ConditionAwaitUrgentContracts = `
+"sort": [
+	{ "expiry_time": "asc" },
+	{ "sign.signer": "asc"	},
+	{ "ccid": "asc" }
+], "use_index": ["contract_list", "contract_awaiter_urgent"]`
+
+// CreateQueryAwaitUrgentContracts _
+func CreateQueryAwaitUrgentContracts(kid, ccid, t string) string {
+	return fmt.Sprintf(QueryAwaitContracts, kid, ccid, t, ConditionAwaitUrgentContracts)
 }
 
-// QueryFinContracts _
-const QueryFinContracts = `{
+// ConditionAwaitOldestContracts _
+const ConditionAwaitOldestContracts = `
+"sort": [
+	{ "created_time": "asc"	},
+	{ "expiry_time":"asc" },
+	{ "sign.signer": "asc"},
+    { "ccid": "asc" }
+], "use_index": ["contract_list", "contract_awaiter_oldest"]`
+
+// CreateQueryAwaitOldestContracts _
+func CreateQueryAwaitOldestContracts(kid, ccid, t string) string {
+	return fmt.Sprintf(QueryAwaitContracts, kid, ccid, t, ConditionAwaitOldestContracts)
+}
+
+// QueryOngoingContracts _
+const QueryOngoingContracts = `{
 	"selector": {
 		"sign.signer": "%s",
 		"ccid": "%s",
+		"expiry_time": {
+			"$gt": "%s"
+		},
+		"$and":[
+			{
+				"executed_time": {
+					"$exists": false
+				}
+			},
+			{
+				"canceled_time": {
+					"$exists": false
+				}
+			}
+		],
 		"$or":[
 			{
 				"sign.approved_time":{
 					"$exists": true
 				}
-			},
-			{
+			},{
 				"sign.disapproved_time":{
-					"$exists": true
-				}
-			},
-			{
-				"executed_time":{
-					"$exists": true
-				}
-			},
-			{
-				"canceled_time":{
 					"$exists": true
 				}
 			}
 		]
-	}, 
-	"use_index":["contract_list", "contract_fin"]
+	}, %s
 }`
 
-// CreateQueryFinContracts _
-func CreateQueryFinContracts(kid string, ccid string) string {
-	return fmt.Sprintf(QueryFinContracts, kid, ccid)
+// ConditionOngoingBriskContracts _
+const ConditionOngoingBriskContracts = `
+"sort": [
+	{ "updated_time": "desc" },
+	{ "expiry_time":"desc" },
+	{ "sign.signer": "desc"},
+    { "ccid": "desc" }
+], "use_index": ["contract_list", "contract_ongoing_brisk"]`
+
+// CreateQueryOngoingBriskContracts _
+func CreateQueryOngoingBriskContracts(kid, ccid, t string) string {
+	return fmt.Sprintf(QueryOngoingContracts, kid, ccid, t, ConditionOngoingBriskContracts)
 }
 
-// QueryexpiryContracts _
-const QueryexpiryContracts = `{
-	"selector": {
-		"sign.signer": "%s",
-		"ccid": "%s",
-		"expiry_time": {
-			"$lte": "%s"
-		}
-	}, 
-	"use_index":["contract_list", "contract_expiry"]
-}`
+// ConditionOngoingOldestContracts _
+const ConditionOngoingOldestContracts = `
+"sort": [
+	{ "created_time": "asc"	},
+	{ "expiry_time":"asc" },
+	{ "sign.signer": "asc"},
+    { "ccid": "asc" }
+], "use_index": ["contract_list", "contract_ongoing_oldest"]`
 
-// CreateQueryexpiryContracts _
-func CreateQueryexpiryContracts(kid, ccid, t string) string {
-	return fmt.Sprintf(QueryexpiryContracts, kid, ccid, t)
+// CreateQueryOngoingOldestContracts _
+func CreateQueryOngoingOldestContracts(kid, ccid, t string) string {
+	return fmt.Sprintf(QueryOngoingContracts, kid, ccid, t, ConditionOngoingOldestContracts)
+}
+
+// QueryFinContracts _
+const QueryFinContracts = `{
+	"selector": {
+	   "sign.signer": "%s",
+	   "ccid": "%s",
+	   "$or": [
+		  {
+			 "sign.approved_time": {
+				"$exists": true
+			 }
+		  },
+		  {
+			 "sign.disapproved_time": {
+				"$exists": true
+			 }
+		  },
+		  {
+			 "executed_time": {
+				"$exists": true
+			 }
+		  },
+		  {
+			 "canceled_time": {
+				"$exists": true
+			 }
+		  },
+		  {
+			 "$and": [
+				{
+				   "sign.approved_time": {
+					  "$exists": false
+				   }
+				},
+				{
+				   "sign.disapproved_time": {
+					  "$exists": false
+				   }
+				},
+				{
+				   "executed_time": {
+					  "$exists": false
+				   }
+				},
+				{
+				   "canceled_time": {
+					  "$exists": false
+				   }
+				}
+			 ]
+		  }
+	   ],
+	   "expiry_time": {
+		  "$lte": "%s"
+	   }
+	},
+	"sort": [
+		{"created_time": "desc"},
+		{"expiry_time": "desc"},
+        {"sign.signer": "desc"},
+        {"ccid": "desc"}
+   ],
+	"use_index": [
+	   "contract_list",
+	   "contract_fin"
+	]
+ }`
+
+// CreateQueryFinContracts _
+func CreateQueryFinContracts(kid, ccid, t string) string {
+	return fmt.Sprintf(QueryFinContracts, kid, ccid, t)
 }
