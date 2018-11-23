@@ -34,10 +34,10 @@ type TxFunc func(shim.ChaincodeStubInterface, []string) peer.Response
 var routes = map[string]TxFunc{
 	"approve":    contractApprove,
 	"cancel":     contractCancel,
+	"create":     contractCreate,
 	"disapprove": contractDisapprove,
 	"get":        contractGet,
 	"list":       contractList,
-	"new":        contractNew,
 	"ver":        ver,
 }
 

@@ -57,6 +57,55 @@ func contractCancel(stub shim.ChaincodeStubInterface, params []string) peer.Resp
 	return shim.Success([]byte("cancel"))
 }
 
+// params[0] : document (JSON string)
+// params[1] : expiry (duration represented by int64 seconds, multi-sig only)
+// params[2:] : signers' KID (exclude invoker, max 127)
+func contractCreate(stub shim.ChaincodeStubInterface, params []string) peer.Response {
+	ccid, err := ccid.GetID(stub)
+	if err != nil || "kiesnet-contract" == ccid || "kiesnet-cc-contract" == ccid {
+		return shim.Error("invalid access")
+	}
+
+	if len(params) < 3 {
+		return shim.Error("incorrect number of parameters. expecting 3+")
+	}
+
+	// authentication
+	kid, err := kid.GetID(stub, true)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	signers := stringset.New(kid)
+	signers.AppendSlice(params[2:])
+
+	if signers.Size() < 2 {
+		return shim.Error("not enough signers")
+	} else if signers.Size() > 128 {
+		return shim.Error("too many signers")
+	}
+
+	expiry, err := strconv.ParseInt(params[1], 10, 64)
+	if err != nil {
+		expiry = 0
+	}
+
+	document := params[0]
+
+	cb := NewContractStub(stub)
+	contract, err := cb.CreateContracts(kid, ccid, document, signers, expiry)
+	if err != nil {
+		logger.Debug(err.Error())
+		return shim.Error("failed to create contracts")
+	}
+
+	data, err := json.Marshal(contract)
+	if err != nil {
+		return shim.Error("failed to marshal the contract")
+	}
+	return shim.Success(data)
+}
+
 // params[0] : contract ID
 func contractDisapprove(stub shim.ChaincodeStubInterface, params []string) peer.Response {
 	if len(params) != 1 {
@@ -121,53 +170,4 @@ func contractGet(stub shim.ChaincodeStubInterface, params []string) peer.Respons
 // params[1] : ....
 func contractList(stub shim.ChaincodeStubInterface, params []string) peer.Response {
 	return shim.Success([]byte("list"))
-}
-
-// params[0] : document (JSON string)
-// params[1] : expiry (duration represented by int64 seconds, multi-sig only)
-// params[2:] : signers' KID (exclude invoker, max 127)
-func contractNew(stub shim.ChaincodeStubInterface, params []string) peer.Response {
-	ccid, err := ccid.GetID(stub)
-	if err != nil || "kiesnet-contract" == ccid || "kiesnet-cc-contract" == ccid {
-		return shim.Error("invalid access")
-	}
-
-	if len(params) < 3 {
-		return shim.Error("incorrect number of parameters. expecting 3+")
-	}
-
-	// authentication
-	kid, err := kid.GetID(stub, true)
-	if err != nil {
-		return shim.Error(err.Error())
-	}
-
-	signers := stringset.New(kid)
-	signers.AppendSlice(params[2:])
-
-	if signers.Size() < 2 {
-		return shim.Error("not enough signers")
-	} else if signers.Size() > 128 {
-		return shim.Error("too many signers")
-	}
-
-	expiry, err := strconv.ParseInt(params[1], 10, 64)
-	if err != nil {
-		expiry = 0
-	}
-
-	document := params[0]
-
-	cb := NewContractStub(stub)
-	contract, err := cb.CreateContracts(kid, ccid, document, signers, expiry)
-	if err != nil {
-		logger.Debug(err.Error())
-		return shim.Error("failed to create contracts")
-	}
-
-	data, err := json.Marshal(contract)
-	if err != nil {
-		return shim.Error("failed to marshal the contract")
-	}
-	return shim.Success(data)
 }
