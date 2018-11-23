@@ -66,11 +66,7 @@ const QueryAwaitContracts = `{
 
 // ConditionAwaitUrgentContracts _
 const ConditionAwaitUrgentContracts = `
-"sort": [
-	{ "expiry_time": "asc" },
-	{ "sign.signer": "asc"	},
-	{ "ccid": "asc" }
-], "use_index": ["contract_list", "contract_awaiter_urgent"]`
+"sort": [ {"expiry_time":"desc"}], "use_index": ["contract_list", "contract_awaiter_urgent"]`
 
 // CreateQueryAwaitUrgentContracts _
 func CreateQueryAwaitUrgentContracts(kid, ccid, t string) string {
@@ -79,12 +75,7 @@ func CreateQueryAwaitUrgentContracts(kid, ccid, t string) string {
 
 // ConditionAwaitOldestContracts _
 const ConditionAwaitOldestContracts = `
-"sort": [
-	{ "created_time": "asc"	},
-	{ "expiry_time":"asc" },
-	{ "sign.signer": "asc"},
-    { "ccid": "asc" }
-], "use_index": ["contract_list", "contract_awaiter_oldest"]`
+"sort": [ "sign.signer","ccid","created_time" ], "use_index": ["contract_list", "contract_awaiter_oldest"]`
 
 // CreateQueryAwaitOldestContracts _
 func CreateQueryAwaitOldestContracts(kid, ccid, t string) string {
@@ -128,10 +119,9 @@ const QueryOngoingContracts = `{
 // ConditionOngoingBriskContracts _
 const ConditionOngoingBriskContracts = `
 "sort": [
-	{ "updated_time": "desc" },
-	{ "expiry_time":"desc" },
 	{ "sign.signer": "desc"},
-    { "ccid": "desc" }
+    { "ccid": "desc" },
+	{ "updated_time": "desc" }
 ], "use_index": ["contract_list", "contract_ongoing_brisk"]`
 
 // CreateQueryOngoingBriskContracts _
@@ -141,12 +131,7 @@ func CreateQueryOngoingBriskContracts(kid, ccid, t string) string {
 
 // ConditionOngoingOldestContracts _
 const ConditionOngoingOldestContracts = `
-"sort": [
-	{ "created_time": "asc"	},
-	{ "expiry_time":"asc" },
-	{ "sign.signer": "asc"},
-    { "ccid": "asc" }
-], "use_index": ["contract_list", "contract_ongoing_oldest"]`
+"sort": [ "sign.signer","ccid","created_time" ], "use_index": ["contract_list", "contract_ongoing_oldest"]`
 
 // CreateQueryOngoingOldestContracts _
 func CreateQueryOngoingOldestContracts(kid, ccid, t string) string {
@@ -158,6 +143,9 @@ const QueryFinContracts = `{
 	"selector": {
 	   "sign.signer": "%s",
 	   "ccid": "%s",
+	   "expiry_time": {
+		  "$lte": "%s"
+	   },
 	   "$or": [
 		  {
 			 "sign.approved_time": {
@@ -203,16 +191,12 @@ const QueryFinContracts = `{
 				}
 			 ]
 		  }
-	   ],
-	   "expiry_time": {
-		  "$lte": "%s"
-	   }
+	   ]
 	},
 	"sort": [
-		{"created_time": "desc"},
-		{"expiry_time": "desc"},
-        {"sign.signer": "desc"},
-        {"ccid": "desc"}
+		{"sign.signer": "desc"},
+        {"ccid": "desc"},
+		{"updated_time": "desc"}
    ],
 	"use_index": [
 	   "contract_list",

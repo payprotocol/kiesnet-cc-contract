@@ -50,16 +50,13 @@
         },
         "fields": [
             {
-                "created_time": "desc"
-            },
-            {
-                "expiry_time": "desc"
-            },
-            {
                 "sign.signer": "desc"
             },
             {
                 "ccid": "desc"
+            },
+            {
+                "updated_time": "desc"
             }
         ]
     },

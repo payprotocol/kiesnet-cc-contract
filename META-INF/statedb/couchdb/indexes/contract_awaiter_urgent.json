@@ -24,17 +24,7 @@
                 }
             ]
         },
-        "fields": [
-            {
-                "expiry_time": "asc"
-            },
-            {
-                "sign.signer": "asc"
-            },
-            {
-                "ccid": "asc"
-            }
-        ]
+        "fields": ["expiry_time","sign.signer","ccid" ]
     },
     "ddoc": "contract_list",
     "name": "contract_awaiter_urgent",

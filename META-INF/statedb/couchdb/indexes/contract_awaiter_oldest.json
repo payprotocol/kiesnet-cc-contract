@@ -24,20 +24,7 @@
                 }
             ]
         },
-        "fields": [
-            {
-                "created_time": "asc"
-            },
-            {
-                "expiry_time":"asc"
-            },
-            {
-                "sign.signer": "asc"
-            },
-            {
-                "ccid": "asc"
-            }
-        ]
+        "fields": ["sign.signer","ccid","created_time","expiry_time" ]
     },
     "ddoc": "contract_list",
     "name": "contract_awaiter_oldest",
