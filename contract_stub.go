@@ -74,7 +74,7 @@ func (cb *ContractStub) CreateContracts(creator, ccid, document string, signers 
 			DOCTYPEID:     id,
 			Creator:       creator,
 			SignersCount:  scount,
-			ApprovedCount: 1,
+			ApprovedCount: 1, // creator has approved
 			CCID:          ccid,
 			Document:      document,
 			CreatedTime:   ts,
