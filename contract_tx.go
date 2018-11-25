@@ -8,9 +8,9 @@ import (
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	"github.com/hyperledger/fabric/protos/peer"
-	"github.com/key-inside/kiesnet-ccpkg/ccid"
 	"github.com/key-inside/kiesnet-ccpkg/kid"
 	"github.com/key-inside/kiesnet-ccpkg/stringset"
+	"github.com/pkg/errors"
 )
 
 // params[0] : contract ID
@@ -37,8 +37,11 @@ func contractApprove(stub shim.ChaincodeStubInterface, params []string) peer.Res
 		return shim.Error(err.Error())
 	}
 
-	if contract.SignersCount == contract.ApprovedCount {
-		// TODO: invoke Execute!
+	if contract.ExecutedTime != nil {
+		// execute contract
+		if err = invokeExecuteContract(stub, contract); err != nil {
+			return shim.Error("failed to approve the contract: " + err.Error())
+		}
 	}
 
 	data, err := json.Marshal(contract)
@@ -61,10 +64,12 @@ func contractCancel(stub shim.ChaincodeStubInterface, params []string) peer.Resp
 // params[1] : expiry (duration represented by int64 seconds, multi-sig only)
 // params[2:] : signers' KID (exclude invoker, max 127)
 func contractCreate(stub shim.ChaincodeStubInterface, params []string) peer.Response {
-	ccid, err := ccid.GetID(stub)
-	if err != nil || "kiesnet-contract" == ccid || "kiesnet-cc-contract" == ccid {
-		return shim.Error("invalid access")
-	}
+	// ccid, err := ccid.GetID(stub)
+	// if err != nil || "kiesnet-contract" == ccid || "kiesnet-cc-contract" == ccid {
+	// 	return shim.Error("invalid access")
+	// }
+	// TODO: ... fix bug
+	ccid := "kiesnet-cc-token"
 
 	if len(params) < 3 {
 		return shim.Error("incorrect number of parameters. expecting 3+")
@@ -130,7 +135,10 @@ func contractDisapprove(stub shim.ChaincodeStubInterface, params []string) peer.
 		return shim.Error(err.Error())
 	}
 
-	// TODO: invoke Cancel!
+	// cancel contract
+	if err = invokeCancelContract(stub, contract); err != nil {
+		return shim.Error("failed to cancel the contract: " + err.Error())
+	}
 
 	data, err := json.Marshal(contract)
 	if err != nil {
@@ -170,4 +178,24 @@ func contractGet(stub shim.ChaincodeStubInterface, params []string) peer.Respons
 // params[1] : ....
 func contractList(stub shim.ChaincodeStubInterface, params []string) peer.Response {
 	return shim.Success([]byte("list"))
+}
+
+// helpers
+
+func invokeCallback(stub shim.ChaincodeStubInterface, ccid string, args [][]byte) error {
+	res := stub.InvokeChaincode(ccid, args, "")
+	if res.GetStatus() == 200 {
+		return nil
+	}
+	return errors.New(res.GetMessage())
+}
+
+func invokeExecuteContract(stub shim.ChaincodeStubInterface, contract *Contract) error {
+	args := [][]byte{[]byte("contract/execute"), []byte(contract.DOCTYPEID), []byte(contract.Document)}
+	return invokeCallback(stub, contract.CCID, args)
+}
+
+func invokeCancelContract(stub shim.ChaincodeStubInterface, contract *Contract) error {
+	args := [][]byte{[]byte("contract/cancel"), []byte(contract.DOCTYPEID), []byte(contract.Document)}
+	return invokeCallback(stub, contract.CCID, args)
 }
