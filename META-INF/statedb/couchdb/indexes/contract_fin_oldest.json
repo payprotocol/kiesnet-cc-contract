@@ -1,0 +1,8 @@
+{
+    "index": {
+        "fields": [ "sign.signer", "ccid", "created_time"  ]
+    },
+    "ddoc": "contract_list",
+    "name": "contract_fin_oldest",
+    "type": "json"
+}

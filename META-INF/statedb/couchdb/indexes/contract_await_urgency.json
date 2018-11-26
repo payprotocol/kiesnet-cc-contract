@@ -24,9 +24,9 @@
                 }
             ]
         },
-        "fields": ["sign.signer","ccid","created_time" ]
+        "fields": ["sign.signer","ccid", "finished_time" ]
     },
     "ddoc": "contract_list",
-    "name": "contract_awaiter_oldest",
+    "name": "contract_await_urgency",
     "type": "json"
 }
