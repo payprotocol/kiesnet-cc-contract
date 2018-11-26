@@ -40,7 +40,7 @@ func (cb *ContractStub) CreateHash(text string) string {
 }
 
 // CreateContracts _
-func (cb *ContractStub) CreateContracts(creator, ccid, document string, signers stringset.Set, expiry int64) (*Contract, error) {
+func (cb *ContractStub) CreateContracts(creator, ccid, document string, signers *stringset.Set, expiry int64) (*Contract, error) {
 	ts, err := txtime.GetTime(cb.stub)
 	if err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func (cb *ContractStub) CreateContracts(creator, ccid, document string, signers 
 
 	var _contract *Contract // creator's contract (for return)
 
-	for signer := range signers {
+	for signer := range signers.Map() {
 		sign := &Sign{
 			Signer: signer,
 		}
@@ -76,7 +76,7 @@ func (cb *ContractStub) CreateContracts(creator, ccid, document string, signers 
 			DOCTYPEID:     id,
 			Creator:       creator,
 			SignersCount:  scount,
-			ApprovedCount: 1,
+			ApprovedCount: 1, // creator has approved
 			CCID:          ccid,
 			Document:      document,
 			CreatedTime:   ts,
