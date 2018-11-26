@@ -66,7 +66,7 @@ const QueryAwaitContracts = `{
 
 // ConditionAwaitUrgentContracts _
 const ConditionAwaitUrgentContracts = `
-"sort": [ {"expiry_time":"desc"}], "use_index": ["contract_list", "contract_awaiter_urgent"]`
+"sort": [ {"sign.signer":"desc"},{"ccid":"desc"},{"expiry_time":"desc"}], "use_index": ["contract_list", "contract_awaiter_urgent"]`
 
 // CreateQueryAwaitUrgentContracts _
 func CreateQueryAwaitUrgentContracts(kid, ccid, t string) string {
