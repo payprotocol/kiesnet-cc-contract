@@ -196,18 +196,7 @@ func contractList(stub shim.ChaincodeStubInterface, params []string) peer.Respon
 	return response(res)
 }
 
-<<<<<<< HEAD
-// params[0] : document (JSON string)
-// params[1] : expiry (duration represented by int64 seconds, multi-sig only)
-// params[2:] : signers' KID (exclude invoker, max 127)
-func contractNew(stub shim.ChaincodeStubInterface, params []string) peer.Response {
-	ccid, err := ccid.GetID(stub)
-	// if err != nil || "kiesnet-contract" == ccid || "kiesnet-cc-contract" == ccid {
-	// 	return shim.Error("invalid access")
-	// }
-=======
 // helpers
->>>>>>> master
 
 func invokeCallback(stub shim.ChaincodeStubInterface, ccid string, args [][]byte) error {
 	res := stub.InvokeChaincode(ccid, args, "")
