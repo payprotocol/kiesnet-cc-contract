@@ -231,6 +231,7 @@ func (cb *ContractStub) GetContractList(option, bookmark string) (*QueryResult, 
 	t := ts.Format(time.RFC3339)
 	switch option {
 	case "await.urgency":
+		fallthrough
 	default:
 		query = CreateQueryAwaitUrgentContracts(kid, ccid, t)
 	case "await.oldest":
