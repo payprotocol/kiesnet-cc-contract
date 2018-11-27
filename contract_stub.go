@@ -149,6 +149,25 @@ func (cb *ContractStub) ApproveContract(contract *Contract) (*Contract, error) {
 	return contract, nil
 }
 
+// CancelContract _
+func (cb *ContractStub) CancelContract(contract *Contract) (*Contract, error) {
+	ts, err := txtime.GetTime(cb.stub)
+	if err != nil {
+		return nil, err
+	}
+
+	contract.CanceledTime = ts
+	contract.FinishedTime = ts
+	contract.UpdatedTime = ts
+
+	// update all other signers
+	if err = cb.UpdateContracts(contract); err != nil {
+		return nil, err
+	}
+
+	return contract, nil
+}
+
 // DisapproveContract _
 func (cb *ContractStub) DisapproveContract(contract *Contract) (*Contract, error) {
 	ts, err := txtime.GetTime(cb.stub)

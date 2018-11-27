@@ -21,6 +21,7 @@ type Contract struct {
 	ExpiryTime    *time.Time `json:"expiry_time,omitempty"`
 	ExecutedTime  *time.Time `json:"executed_time,omitempty"`
 	CanceledTime  *time.Time `json:"canceled_time,omitempty"`
+	FinishedTime  *time.Time `json:"finished_time,omitempty"`
 	Sign          *Sign      `json:"sign"`
 }
 

@@ -8,8 +8,10 @@ import (
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	"github.com/hyperledger/fabric/protos/peer"
+	"github.com/key-inside/kiesnet-ccpkg/ccid"
 	"github.com/key-inside/kiesnet-ccpkg/kid"
 	"github.com/key-inside/kiesnet-ccpkg/stringset"
+	"github.com/key-inside/kiesnet-ccpkg/txtime"
 	"github.com/pkg/errors"
 )
 
@@ -53,11 +55,47 @@ func contractApprove(stub shim.ChaincodeStubInterface, params []string) peer.Res
 
 // params[0] : contract ID
 func contractCancel(stub shim.ChaincodeStubInterface, params []string) peer.Response {
+	ccid, err := ccid.GetID(stub)
+	if err != nil || "kiesnet-contract" == ccid || "kiesnet-cc-contract" == ccid {
+		return shim.Error("invalid access")
+	}
+
 	if len(params) != 1 {
 		return shim.Error("incorrect number of parameters. expecting 1")
 	}
-	// TODO
-	return shim.Success([]byte("cancel"))
+
+	// authentication
+	kid, err := kid.GetID(stub, true)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	id := params[0]
+
+	ts, err := txtime.GetTime(stub)
+	if err != nil {
+		logger.Debug(err.Error())
+		return shim.Error("failed to cancel the contract")
+	}
+
+	cb := NewContractStub(stub)
+	contract, err := cb.GetContract(id, kid)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+	// validate
+	if contract.CCID != ccid {
+		return shim.Error("invalid access")
+	}
+	if contract.FinishedTime != nil && ts.After(*contract.FinishedTime) {
+		return shim.Error("already finished contract")
+	}
+
+	if _, err = cb.CancelContract(contract); err != nil {
+		return shim.Error(err.Error())
+	}
+
+	return shim.Success(nil)
 }
 
 // params[0] : document (JSON string)
