@@ -245,8 +245,7 @@ func (cb *ContractStub) GetContractList(option, bookmark string) (*QueryResult, 
 	case "fin.oldest":
 		query = CreateQueryFinOldestContracts(kid, ccid, t)
 	}
-	fmt.Println(query)
-	// Bookmark - little bit different..too long
+
 	iter, meta, err := cb.stub.GetQueryResultWithPagination(query, ContractListFetchSize, bookmark)
 	if nil != err {
 		return nil, err
