@@ -183,7 +183,7 @@ func contractList(stub shim.ChaincodeStubInterface, params []string) peer.Respon
 			ASIS : exact case search
 	*/
 	if len(params) < 2 {
-		shim.Error("incorrect number of parameters. expecting 2")
+		return shim.Error("incorrect number of parameters. expecting 2")
 	}
 	option := params[0]
 	b := params[1]
