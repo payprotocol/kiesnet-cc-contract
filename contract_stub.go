@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
+	"github.com/key-inside/kiesnet-ccpkg/ccid"
 	"github.com/key-inside/kiesnet-ccpkg/kid"
 	"github.com/key-inside/kiesnet-ccpkg/stringset"
 	"github.com/key-inside/kiesnet-ccpkg/txtime"
@@ -218,11 +219,10 @@ func (cb *ContractStub) GetContractList(option, bookmark string) (*QueryResult, 
 	if nil != err {
 		return nil, err
 	}
-	ccid := "kiesnet-cc-token"
-	// ccid, err := ccid.GetID(cb.stub)
-	// if nil != err {
-	// 	return nil, err
-	// }
+	ccid, err := ccid.GetID(cb.stub)
+	if nil != err {
+		return nil, err
+	}
 	query := ""
 	ts, err := txtime.GetTime(cb.stub)
 	if nil != err {
