@@ -24,9 +24,8 @@ const QueryAwaitContracts = `{
 	"selector": {
 		"sign.signer": "%s",
 		"ccid": "%s",
-		"created_time":{"$lt":"%[3]s"},
 		"finished_time": {
-			"$gt": "%[3]s"
+			"$gt": "%s"
 		},
 		"$and":[
 			{
