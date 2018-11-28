@@ -1,0 +1,44 @@
+{
+    "index": {
+        "partial_filter_selector": {
+            "$and": [
+                {
+                    "executed_time": {
+                        "$exists": false
+                    }
+                },
+                {
+                    "canceled_time": {
+                        "$exists": false
+                    }
+                }
+            ],
+            "$or": [
+                {
+                    "sign.approved_time": {
+                        "$exists": true
+                    }
+                },
+                {
+                    "sign.disapproved_time": {
+                        "$exists": true
+                    }
+                }
+            ]
+        },
+        "fields": [
+           {
+                "sign.signer": "desc"
+            },
+            {
+                "ccid": "desc"
+            },
+            {
+                "updated_time": "desc"
+            }
+        ]
+    },
+    "ddoc": "contract_list",
+    "name": "contract_ongoing_brisk",
+    "type": "json"
+}

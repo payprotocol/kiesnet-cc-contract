@@ -1,0 +1,18 @@
+{
+    "index": {
+        "fields": [
+            {
+                "sign.signer": "desc"
+            },
+            {
+                "ccid": "desc"
+            },
+            {
+                "finished_time": "desc"
+            }
+        ]
+    },
+    "ddoc": "contract_list",
+    "name": "contract_fin_latest",
+    "type": "json"
+}

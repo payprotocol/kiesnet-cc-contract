@@ -1,0 +1,32 @@
+{
+    "index": {
+        "partial_filter_selector": {
+            "$and": [
+                {
+                    "sign.approved_time": {
+                        "$exists": false
+                    }
+                },
+                {
+                    "sign.disapproved_time": {
+                        "$exists": false
+                    }
+                },
+                {
+                    "executed_time": {
+                        "$exists": false
+                    }
+                },
+                {
+                    "canceled_time": {
+                        "$exists": false
+                    }
+                }
+            ]
+        },
+        "fields": ["sign.signer","ccid","created_time" ]
+    },
+    "ddoc": "contract_list",
+    "name": "contract_await_oldest",
+    "type": "json"
+}

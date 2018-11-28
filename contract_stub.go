@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
+	"github.com/key-inside/kiesnet-ccpkg/ccid"
+	"github.com/key-inside/kiesnet-ccpkg/kid"
 	"github.com/key-inside/kiesnet-ccpkg/stringset"
 	"github.com/key-inside/kiesnet-ccpkg/txtime"
 	"github.com/pkg/errors"
@@ -51,6 +53,7 @@ func (cb *ContractStub) CreateContracts(creator, ccid, document string, signers 
 	} else { // default 15 days
 		expTime = ts.AddDate(0, 0, 15)
 	}
+	finTime := expTime
 
 	id := cb.CreateHash(creator + cb.stub.GetTxID())
 	// check id collision
@@ -80,6 +83,7 @@ func (cb *ContractStub) CreateContracts(creator, ccid, document string, signers 
 			CreatedTime:   ts,
 			UpdatedTime:   ts,
 			ExpiryTime:    &expTime,
+			FinishedTime:  &finTime,
 			Sign:          sign,
 		}
 		if creator == signer {
@@ -139,6 +143,7 @@ func (cb *ContractStub) ApproveContract(contract *Contract) (*Contract, error) {
 	contract.ApprovedCount++
 	if contract.SignersCount == contract.ApprovedCount {
 		contract.ExecutedTime = ts
+		contract.FinishedTime = ts
 	}
 
 	// update all other signers
@@ -182,6 +187,7 @@ func (cb *ContractStub) DisapproveContract(contract *Contract) (*Contract, error
 	contract.Sign.DisapprovedTime = ts
 	contract.UpdatedTime = ts
 	contract.CanceledTime = ts
+	contract.FinishedTime = ts
 
 	// update all other signers
 	if err = cb.UpdateContracts(contract); err != nil {
@@ -221,4 +227,56 @@ func (cb *ContractStub) UpdateContracts(updater *Contract) error {
 	}
 
 	return nil
+}
+
+// ContractListFetchSize _
+const ContractListFetchSize = 20
+
+// GetContractList  _
+func (cb *ContractStub) GetContractList(option, bookmark string) (*QueryResult, error) {
+	kid, err := kid.GetID(cb.stub, false)
+	if nil != err {
+		return nil, err
+	}
+	ccid, err := ccid.GetID(cb.stub)
+	if nil != err {
+		return nil, err
+	}
+	query := ""
+	ts, err := txtime.GetTime(cb.stub)
+	if nil != err {
+		return nil, err
+	}
+	t := ts.Format(time.RFC3339)
+	switch option {
+	case "await.urgency":
+		fallthrough
+	default:
+		query = CreateQueryAwaitUrgentContracts(kid, ccid, t)
+	case "await.oldest":
+		query = CreateQueryAwaitOldestContracts(kid, ccid, t)
+	case "ongoing.brisk":
+		query = CreateQueryOngoingBriskContracts(kid, ccid, t)
+	case "ongoing.oldest":
+		query = CreateQueryOngoingOldestContracts(kid, ccid, t)
+	case "fin.latest":
+		query = CreateQueryFinLatestContracts(kid, ccid, t)
+	case "fin.oldest":
+		query = CreateQueryFinOldestContracts(kid, ccid, t)
+	}
+
+	iter, meta, err := cb.stub.GetQueryResultWithPagination(query, ContractListFetchSize, bookmark)
+	if nil != err {
+		return nil, err
+	}
+	// Issue... Handling custom error or normal case
+	if meta.GetFetchedRecordsCount() == 0 {
+		return nil, NoFetchRecordsCountError{}
+	}
+	defer iter.Close()
+	result, err := NewQueryResult(meta, iter)
+	if nil != err {
+		return nil, err
+	}
+	return result, nil
 }
