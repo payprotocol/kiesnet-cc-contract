@@ -102,12 +102,10 @@ func contractCancel(stub shim.ChaincodeStubInterface, params []string) peer.Resp
 // params[1] : expiry (duration represented by int64 seconds, multi-sig only)
 // params[2:] : signers' KID (exclude invoker, max 127)
 func contractCreate(stub shim.ChaincodeStubInterface, params []string) peer.Response {
-	// ccid, err := ccid.GetID(stub)
-	// if err != nil || "kiesnet-contract" == ccid || "kiesnet-cc-contract" == ccid {
-	// 	return shim.Error("invalid access")
-	// }
-	// TODO: ... fix bug
-	ccid := "kiesnet-cc-token"
+	ccid, err := ccid.GetID(stub)
+	if err != nil || "kiesnet-contract" == ccid || "kiesnet-cc-contract" == ccid {
+		return shim.Error("invalid access")
+	}
 
 	if len(params) < 3 {
 		return shim.Error("incorrect number of parameters. expecting 3+")
