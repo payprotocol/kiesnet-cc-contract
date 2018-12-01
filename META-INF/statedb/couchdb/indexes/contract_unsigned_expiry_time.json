@@ -3,6 +3,11 @@
         "partial_filter_selector": {
             "$and": [
                 {
+                    "@contract": {
+                        "$exists": true
+                    }
+                },
+                {
                     "sign.approved_time": {
                         "$exists": false
                     }
@@ -24,9 +29,9 @@
                 }
             ]
         },
-        "fields": ["sign.signer","ccid", "finished_time" ]
+        "fields": [ "sign.signer", "ccid", "expiry_time" ]
     },
-    "ddoc": "contract_list",
-    "name": "contract_await_urgency",
+    "ddoc": "contract",
+    "name": "unsigned-expiry-time",
     "type": "json"
 }

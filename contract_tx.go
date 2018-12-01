@@ -3,7 +3,6 @@
 package main
 
 import (
-	"encoding/json"
 	"strconv"
 
 	"github.com/hyperledger/fabric/core/chaincode/shim"
@@ -46,11 +45,7 @@ func contractApprove(stub shim.ChaincodeStubInterface, params []string) peer.Res
 		}
 	}
 
-	data, err := json.Marshal(contract)
-	if err != nil {
-		return shim.Error("failed to marshal the contract")
-	}
-	return shim.Success(data)
+	return response(contract)
 }
 
 // params[0] : contract ID
@@ -91,11 +86,11 @@ func contractCancel(stub shim.ChaincodeStubInterface, params []string) peer.Resp
 		return shim.Error("already finished contract")
 	}
 
-	if _, err = cb.CancelContract(contract); err != nil {
+	if contract, err = cb.CancelContract(contract); err != nil {
 		return shim.Error(err.Error())
 	}
 
-	return shim.Success(nil)
+	return response(contract)
 }
 
 // params[0] : document (JSON string)
@@ -140,11 +135,7 @@ func contractCreate(stub shim.ChaincodeStubInterface, params []string) peer.Resp
 		return shim.Error("failed to create contracts")
 	}
 
-	data, err := json.Marshal(contract)
-	if err != nil {
-		return shim.Error("failed to marshal the contract")
-	}
-	return shim.Success(data)
+	return response(contract)
 }
 
 // params[0] : contract ID
@@ -176,11 +167,7 @@ func contractDisapprove(stub shim.ChaincodeStubInterface, params []string) peer.
 		return shim.Error("failed to cancel the contract: " + err.Error())
 	}
 
-	data, err := json.Marshal(contract)
-	if err != nil {
-		return shim.Error("failed to marshal the contract")
-	}
-	return shim.Success(data)
+	return response(contract)
 }
 
 // params[0] : contract ID
@@ -203,23 +190,32 @@ func contractGet(stub shim.ChaincodeStubInterface, params []string) peer.Respons
 		return shim.Error(err.Error())
 	}
 
-	data, err := json.Marshal(contract)
-	if err != nil {
-		return shim.Error("failed to marshal the contract")
-	}
-	return shim.Success(data)
+	return response(contract)
 }
 
-// params[0] : option
-// params[1] : bookmark
+// params[0] : ccid
+// params[1] : option
+// params[2] : bookmark
 func contractList(stub shim.ChaincodeStubInterface, params []string) peer.Response {
 	if len(params) < 2 {
-		return shim.Error("incorrect number of parameters. expecting 2")
+		return shim.Error("incorrect number of parameters. expecting 2+")
 	}
-	option := params[0]
-	b := params[1]
+
+	// authentication
+	kid, err := kid.GetID(stub, false)
+	if err != nil {
+		return shim.Error(err.Error())
+	}
+
+	ccid := params[0]
+	option := params[1]
+	bookmark := ""
+	if len(params) > 2 {
+		bookmark = params[2]
+	}
+
 	cb := NewContractStub(stub)
-	res, err := cb.GetContractList(option, b)
+	res, err := cb.GetQueryContracts(kid, ccid, option, bookmark)
 	if nil != err {
 		return shim.Error(err.Error())
 	}
