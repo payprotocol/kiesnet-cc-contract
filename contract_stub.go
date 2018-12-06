@@ -44,7 +44,7 @@ func (cb *ContractStub) CreateHash(text string) string {
 func (cb *ContractStub) CreateContracts(creator, ccid, document string, signers *stringset.Set, expiry int64) (*Contract, error) {
 	ts, err := txtime.GetTime(cb.stub)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to get the timestamp")
 	}
 
 	scount := signers.Size()
@@ -111,7 +111,7 @@ func (cb *ContractStub) GetContract(id, signer string) (*Contract, error) {
 		}
 		return contract, nil
 	}
-	return nil, NotExistedContractError{id, signer}
+	return nil, NotExistedContractError{id: id, signer: signer}
 }
 
 // PutContract _
@@ -131,7 +131,7 @@ func (cb *ContractStub) PutContract(contract *Contract) error {
 func (cb *ContractStub) ApproveContract(contract *Contract) (*Contract, error) {
 	ts, err := txtime.GetTime(cb.stub)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to get the timestamp")
 	}
 
 	if err = contract.AssertSignable(*ts); err != nil {
@@ -158,7 +158,7 @@ func (cb *ContractStub) ApproveContract(contract *Contract) (*Contract, error) {
 func (cb *ContractStub) CancelContract(contract *Contract) (*Contract, error) {
 	ts, err := txtime.GetTime(cb.stub)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to get the timestamp")
 	}
 
 	contract.CanceledTime = ts
@@ -177,7 +177,7 @@ func (cb *ContractStub) CancelContract(contract *Contract) (*Contract, error) {
 func (cb *ContractStub) DisapproveContract(contract *Contract) (*Contract, error) {
 	ts, err := txtime.GetTime(cb.stub)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to get the timestamp")
 	}
 
 	if err = contract.AssertSignable(*ts); err != nil {
@@ -234,7 +234,7 @@ func (cb *ContractStub) UpdateContracts(updater *Contract) error {
 func (cb *ContractStub) GetQueryContracts(kid, ccid, opt, bookmark string) (*QueryResult, error) {
 	ts, err := txtime.GetTime(cb.stub)
 	if nil != err {
-		return nil, err
+		return nil, errors.Wrap(err, "failed to get the timestamp")
 	}
 
 	query := ""

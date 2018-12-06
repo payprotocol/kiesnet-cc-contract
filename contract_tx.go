@@ -31,17 +31,17 @@ func contractApprove(stub shim.ChaincodeStubInterface, params []string) peer.Res
 	cb := NewContractStub(stub)
 	contract, err := cb.GetContract(id, kid)
 	if err != nil {
-		return shim.Error(err.Error())
+		return responseError(err, "failed to approve the contract")
 	}
 	contract, err = cb.ApproveContract(contract)
 	if err != nil {
-		return shim.Error(err.Error())
+		return responseError(err, "failed to approve the contract")
 	}
 
 	if contract.ExecutedTime != nil {
 		// execute contract
 		if err = invokeExecuteContract(stub, contract); err != nil {
-			return shim.Error("failed to approve the contract: " + err.Error())
+			return shim.Error("failed to execute the contract: " + err.Error())
 		}
 	}
 
@@ -69,8 +69,7 @@ func contractCancel(stub shim.ChaincodeStubInterface, params []string) peer.Resp
 
 	ts, err := txtime.GetTime(stub)
 	if err != nil {
-		logger.Debug(err.Error())
-		return shim.Error("failed to cancel the contract")
+		return responseError(err, "failed to cancel the contract")
 	}
 
 	cb := NewContractStub(stub)
@@ -87,7 +86,7 @@ func contractCancel(stub shim.ChaincodeStubInterface, params []string) peer.Resp
 	}
 
 	if contract, err = cb.CancelContract(contract); err != nil {
-		return shim.Error(err.Error())
+		return responseError(err, "failed to cancel the contract")
 	}
 
 	return response(contract)
@@ -131,8 +130,7 @@ func contractCreate(stub shim.ChaincodeStubInterface, params []string) peer.Resp
 	cb := NewContractStub(stub)
 	contract, err := cb.CreateContracts(kid, ccid, document, signers, expiry)
 	if err != nil {
-		logger.Debug(err.Error())
-		return shim.Error("failed to create contracts")
+		return responseError(err, "failed to create the contract")
 	}
 
 	return response(contract)
@@ -187,7 +185,7 @@ func contractGet(stub shim.ChaincodeStubInterface, params []string) peer.Respons
 	cb := NewContractStub(stub)
 	contract, err := cb.GetContract(id, kid)
 	if err != nil {
-		return shim.Error(err.Error())
+		return responseError(err, "failed to get the contract")
 	}
 
 	return response(contract)
@@ -217,7 +215,7 @@ func contractList(stub shim.ChaincodeStubInterface, params []string) peer.Respon
 	cb := NewContractStub(stub)
 	res, err := cb.GetQueryContracts(kid, ccid, option, bookmark)
 	if nil != err {
-		return shim.Error(err.Error())
+		return responseError(err, "failed to get contracts list")
 	}
 
 	return response(res)
