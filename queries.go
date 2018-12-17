@@ -4,7 +4,8 @@ package main
 
 import (
 	"fmt"
-	"time"
+
+	"github.com/key-inside/kiesnet-ccpkg/txtime"
 )
 
 // QueryContractsByID _
@@ -55,8 +56,8 @@ const QueryFinishedContractsBySigner = `{
 }`
 
 // CreateQueryFinishedContractsBySigner _
-func CreateQueryFinishedContractsBySigner(kid, ccid string, ts *time.Time) string {
-	return fmt.Sprintf(QueryFinishedContractsBySigner, kid, ccid, ts.Format(time.RFC3339Nano))
+func CreateQueryFinishedContractsBySigner(kid, ccid string, ts *txtime.Time) string {
+	return fmt.Sprintf(QueryFinishedContractsBySigner, kid, ccid, ts.String())
 }
 
 // QueryUnfinishedContractsBySigner _
@@ -76,8 +77,8 @@ const QueryUnfinishedContractsBySigner = `{
 }`
 
 // CreateQueryUnfinishedContractsBySigner _
-func CreateQueryUnfinishedContractsBySigner(kid, ccid string, ts *time.Time) string {
-	return fmt.Sprintf(QueryUnfinishedContractsBySigner, kid, ccid, ts.Format(time.RFC3339Nano))
+func CreateQueryUnfinishedContractsBySigner(kid, ccid string, ts *txtime.Time) string {
+	return fmt.Sprintf(QueryUnfinishedContractsBySigner, kid, ccid, ts.String())
 }
 
 // QueryApprovedContractsBySigner - unfinished, approved
@@ -116,8 +117,8 @@ const QueryApprovedContractsBySigner = `{
 }`
 
 // CreateQueryApprovedContractsBySigner _
-func CreateQueryApprovedContractsBySigner(kid, ccid string, ts *time.Time) string {
-	return fmt.Sprintf(QueryApprovedContractsBySigner, kid, ccid, ts.Format(time.RFC3339Nano))
+func CreateQueryApprovedContractsBySigner(kid, ccid string, ts *txtime.Time) string {
+	return fmt.Sprintf(QueryApprovedContractsBySigner, kid, ccid, ts.String())
 }
 
 // QueryUnsignedContractsBySigner - unfinished, unsigned
@@ -161,6 +162,6 @@ const QueryUnsignedContractsBySigner = `{
 }`
 
 // CreateQueryUnsignedContractsBySigner _
-func CreateQueryUnsignedContractsBySigner(kid, ccid string, ts *time.Time) string {
-	return fmt.Sprintf(QueryUnsignedContractsBySigner, kid, ccid, ts.Format(time.RFC3339Nano))
+func CreateQueryUnsignedContractsBySigner(kid, ccid string, ts *txtime.Time) string {
+	return fmt.Sprintf(QueryUnsignedContractsBySigner, kid, ccid, ts.String())
 }

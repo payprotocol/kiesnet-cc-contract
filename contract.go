@@ -4,37 +4,37 @@ package main
 
 import (
 	"encoding/json"
-	"time"
 
+	"github.com/key-inside/kiesnet-ccpkg/txtime"
 	"github.com/pkg/errors"
 )
 
 // Contract represents the contract
 type Contract struct {
-	DOCTYPEID     string     `json:"@contract"`
-	Creator       string     `json:"creator"`
-	SignersCount  int        `json:"signers_count"`
-	ApprovedCount int        `json:"approved_count"`
-	CCID          string     `json:"ccid"`
-	Document      string     `json:"document"`
-	CreatedTime   *time.Time `json:"created_time,omitempty"`
-	UpdatedTime   *time.Time `json:"updated_time,omitempty"`
-	ExpiryTime    *time.Time `json:"expiry_time,omitempty"`
-	ExecutedTime  *time.Time `json:"executed_time,omitempty"`
-	CanceledTime  *time.Time `json:"canceled_time,omitempty"`
-	FinishedTime  *time.Time `json:"finished_time,omitempty"`
-	Sign          *Sign      `json:"sign"`
+	DOCTYPEID     string       `json:"@contract"`
+	Creator       string       `json:"creator"`
+	SignersCount  int          `json:"signers_count"`
+	ApprovedCount int          `json:"approved_count"`
+	CCID          string       `json:"ccid"`
+	Document      string       `json:"document"`
+	CreatedTime   *txtime.Time `json:"created_time,omitempty"`
+	UpdatedTime   *txtime.Time `json:"updated_time,omitempty"`
+	ExpiryTime    *txtime.Time `json:"expiry_time,omitempty"`
+	ExecutedTime  *txtime.Time `json:"executed_time,omitempty"`
+	CanceledTime  *txtime.Time `json:"canceled_time,omitempty"`
+	FinishedTime  *txtime.Time `json:"finished_time,omitempty"`
+	Sign          *Sign        `json:"sign"`
 }
 
 // AssertSignable _
-func (c *Contract) AssertSignable(t time.Time) error {
+func (c *Contract) AssertSignable(t txtime.Time) error {
 	if c.ExecutedTime != nil {
 		return errors.New("already executed")
 	}
 	if c.CanceledTime != nil {
 		return errors.New("already canceled")
 	}
-	if c.ExpiryTime != nil && !c.ExpiryTime.After(t) { // t == expiry => expired
+	if c.ExpiryTime != nil && !c.ExpiryTime.After(*t.Time) { // t == expiry => expired
 		return errors.New("already expired")
 	}
 	if c.Sign.ApprovedTime != nil {

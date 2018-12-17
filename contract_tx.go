@@ -81,7 +81,7 @@ func contractCancel(stub shim.ChaincodeStubInterface, params []string) peer.Resp
 	if contract.CCID != ccid {
 		return shim.Error("invalid access")
 	}
-	if contract.FinishedTime != nil && ts.After(*contract.FinishedTime) {
+	if contract.FinishedTime != nil && ts.After(*contract.FinishedTime.Time) {
 		return shim.Error("already finished contract")
 	}
 

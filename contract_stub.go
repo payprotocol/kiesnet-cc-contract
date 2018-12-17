@@ -48,11 +48,13 @@ func (cb *ContractStub) CreateContracts(creator, ccid, document string, signers 
 	}
 
 	scount := signers.Size()
-	var expTime time.Time
+	var expTime txtime.Time
 	if expiry > 0 {
-		expTime = ts.Add(time.Second * time.Duration(expiry))
+		t := ts.Add(time.Second * time.Duration(expiry))
+		expTime.Time = &t
 	} else { // default 15 days
-		expTime = ts.AddDate(0, 0, 15)
+		t := ts.AddDate(0, 0, 15)
+		expTime.Time = &t
 	}
 
 	id := cb.CreateHash(creator + cb.stub.GetTxID())
