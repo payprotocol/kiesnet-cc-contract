@@ -48,13 +48,11 @@ func (cb *ContractStub) CreateContracts(creator, ccid, document string, signers 
 	}
 
 	scount := signers.Size()
-	var expTime txtime.Time
+	var expTime *txtime.Time
 	if expiry > 0 {
-		t := ts.Add(time.Second * time.Duration(expiry))
-		expTime.Time = &t
+		expTime = txtime.New(ts.Add(time.Second * time.Duration(expiry)))
 	} else { // default 15 days
-		t := ts.AddDate(0, 0, 15)
-		expTime.Time = &t
+		expTime = txtime.New(ts.AddDate(0, 0, 15))
 	}
 
 	id := cb.CreateHash(creator + cb.stub.GetTxID())
@@ -84,8 +82,8 @@ func (cb *ContractStub) CreateContracts(creator, ccid, document string, signers 
 			Document:      document,
 			CreatedTime:   ts,
 			UpdatedTime:   ts,
-			ExpiryTime:    &expTime,
-			FinishedTime:  &expTime,
+			ExpiryTime:    expTime,
+			FinishedTime:  expTime,
 			Sign:          sign,
 		}
 		if creator == signer {
@@ -136,7 +134,7 @@ func (cb *ContractStub) ApproveContract(contract *Contract) (*Contract, error) {
 		return nil, errors.Wrap(err, "failed to get the timestamp")
 	}
 
-	if err = contract.AssertSignable(*ts); err != nil {
+	if err = contract.AssertSignable(ts); err != nil {
 		return nil, err
 	}
 
@@ -182,7 +180,7 @@ func (cb *ContractStub) DisapproveContract(contract *Contract) (*Contract, error
 		return nil, errors.Wrap(err, "failed to get the timestamp")
 	}
 
-	if err = contract.AssertSignable(*ts); err != nil {
+	if err = contract.AssertSignable(ts); err != nil {
 		return nil, err
 	}
 

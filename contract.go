@@ -27,14 +27,14 @@ type Contract struct {
 }
 
 // AssertSignable _
-func (c *Contract) AssertSignable(t txtime.Time) error {
+func (c *Contract) AssertSignable(t *txtime.Time) error {
 	if c.ExecutedTime != nil {
 		return errors.New("already executed")
 	}
 	if c.CanceledTime != nil {
 		return errors.New("already canceled")
 	}
-	if c.ExpiryTime != nil && !c.ExpiryTime.After(*t.Time) { // t == expiry => expired
+	if c.ExpiryTime != nil && t != nil && t.Cmp(c.ExpiryTime) >= 0 {
 		return errors.New("already expired")
 	}
 	if c.Sign.ApprovedTime != nil {
