@@ -49,7 +49,7 @@ func (cb *ContractStub) CreateContracts(creator, ccid, document string, signers 
 
 	scount := signers.Size()
 	var expTime *txtime.Time
-	if expiry > 0 {
+	if expiry >= 600 { // minimum 10 minutes
 		expTime = txtime.New(ts.Add(time.Second * time.Duration(expiry)))
 	} else { // default 15 days
 		expTime = txtime.New(ts.AddDate(0, 0, 15))

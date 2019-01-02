@@ -28,7 +28,7 @@ method __`func`__ [arg1, _arg2_, ... ] {trs1, _trs2_, ... }
 > invoke __`create`__ [document, expiry, signers...] {_"kiesnet-id/pin"_}
 - Create a contract
 - [document] : contract document JSON string, it will be passed to callbacks
-- [expiry] : duration(seconds) represented by int64, if it < 1, default expiry will be set (15 days)
+- [expiry] : duration(seconds) represented by int64, if it's less than 10 minutes, default expiry will be set (15 days)
 - [signers...] : KIDs of signers (exclude invoker, max 127)
 
 > invoke __`disapprove`__ [contract_id] {_"kiesnet-id/pin"_}
