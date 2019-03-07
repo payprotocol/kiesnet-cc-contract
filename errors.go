@@ -26,5 +26,5 @@ type NotExistedContractError struct {
 
 // Error implements error interface
 func (e NotExistedContractError) Error() string {
-	return fmt.Sprintf("the contract '%s' for the signer '%s' is not exists", e.id, e.signer)
+	return fmt.Sprintf("the contract [%s] for the signer [%s] is not exists", e.id, e.signer)
 }
