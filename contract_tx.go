@@ -41,7 +41,7 @@ func contractApprove(stub shim.ChaincodeStubInterface, params []string) peer.Res
 	if contract.ExecutedTime != nil {
 		// execute contract
 		if err = invokeExecuteContract(stub, contract); err != nil {
-			return shim.Error("failed to execute the contract: " + err.Error())
+			return shim.Error("failed to execute the contract|" + err.Error())
 		}
 	}
 
@@ -162,7 +162,7 @@ func contractDisapprove(stub shim.ChaincodeStubInterface, params []string) peer.
 
 	// cancel contract
 	if err = invokeCancelContract(stub, contract); err != nil {
-		return shim.Error("failed to cancel the contract: " + err.Error())
+		return shim.Error("failed to cancel the contract|" + err.Error())
 	}
 
 	return response(contract)
