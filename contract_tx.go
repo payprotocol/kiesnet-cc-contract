@@ -130,7 +130,7 @@ func contractCreate(stub shim.ChaincodeStubInterface, params []string) peer.Resp
 	cb := NewContractStub(stub)
 	contract, err := cb.CreateContracts(kid, ccid, document, signers, expiry)
 	if err != nil {
-		return responseError(err, "failed to create the contract")
+		return responseError(err, "failed to create a contract")
 	}
 
 	return response(contract)

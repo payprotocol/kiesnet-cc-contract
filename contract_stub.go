@@ -210,7 +210,7 @@ func (cb *ContractStub) UpdateContracts(updater *Contract) error {
 	for iter.HasNext() {
 		kv, err := iter.Next()
 		if err != nil {
-			return errors.Wrap(err, "failed to get a contract")
+			return errors.Wrap(err, "failed to get the contract")
 		}
 		updatee := &Contract{}
 		if err = json.Unmarshal(kv.Value, updatee); err != nil {
