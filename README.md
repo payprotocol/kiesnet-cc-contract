@@ -38,10 +38,10 @@ method __`func`__ [arg1, _arg2_, ... ] {trs1, _trs2_, ... }
 > query __`get`__ [contract_id]
 - Get the contract
 
-> query __`list`__ [ccid, option, _bookmark_]
+> query __`list`__ [ccid, _option_, _bookmark_]
 - Get contracts list of the invoker
 - [ccid] : chaincode ID created a contract
-- [option] : 1 of [finished, unfinished, approved, unsigned, all]
+- [option] : 1 of [finished, unfinished, approved, unsigned, all], default unsigned
 
 > query __`ver`__
 - Get version

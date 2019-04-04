@@ -192,10 +192,10 @@ func contractGet(stub shim.ChaincodeStubInterface, params []string) peer.Respons
 }
 
 // params[0] : ccid
-// params[1] : option
+// params[1] : option - 1 of [finished, unfinished, approved, unsigned, all], default unsigned
 // params[2] : bookmark
 func contractList(stub shim.ChaincodeStubInterface, params []string) peer.Response {
-	if len(params) < 2 {
+	if len(params) < 1 {
 		return shim.Error("incorrect number of parameters. expecting 2+")
 	}
 
@@ -206,10 +206,13 @@ func contractList(stub shim.ChaincodeStubInterface, params []string) peer.Respon
 	}
 
 	ccid := params[0]
-	option := params[1]
+	option := "unsigned"
 	bookmark := ""
-	if len(params) > 2 {
-		bookmark = params[2]
+	if len(params) > 1 {
+		option = params[1]
+		if len(params) > 2 {
+			bookmark = params[2]
+		}
 	}
 
 	cb := NewContractStub(stub)
