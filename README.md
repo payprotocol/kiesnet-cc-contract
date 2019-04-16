@@ -1,10 +1,5 @@
 # Kiesnet Contract Chaincode
 
-## Requirement
-- kiesnet-id chaincode (devmode: kiesnet-cc-id)
-
-#
-
 ## API
 
 method __`func`__ [arg1, _arg2_, ... ] {trs1, _trs2_, ... }
@@ -17,21 +12,21 @@ method __`func`__ [arg1, _arg2_, ... ] {trs1, _trs2_, ... }
 
 #
 
-> invoke __`approve`__ [contract_id] {_"kiesnet-id/pin"_}
+> invoke __`approve`__ [contract_id]
 - Approve the contract
 - If all signers have approved the contract, it invokes 'contract/execute' callback.
 
-> invoke __`cancel`__ [contract_id] {_"kiesnet-id/pin"_}
+> invoke __`cancel`__ [contract_id]
 - Cancel the contract
 - It invokes 'contract/cancel' callback.
 
-> invoke __`create`__ [document, expiry, signers...] {_"kiesnet-id/pin"_}
+> invoke __`create`__ [document, expiry, signers...]
 - Create a contract
 - [document] : contract document JSON string, it will be passed to callbacks
 - [expiry] : duration(seconds) represented by int64, if it's less than 10 minutes, default expiry will be set (15 days)
 - [signers...] : KIDs of signers (exclude invoker, max 127)
 
-> invoke __`disapprove`__ [contract_id] {_"kiesnet-id/pin"_}
+> invoke __`disapprove`__ [contract_id]
 - Disapprove the contract
 - It invokes 'contract/cancel' callback.
 
@@ -53,8 +48,8 @@ Invoker chaincodes must implement callbacks.
 
 #
 
-> invoke __`contract/execute`__ [contract_id, document] {_"kiesnet-id/pin"_}
+> invoke __`contract/execute`__ [contract_id, document]
 - Execute the contract
 
-> invoke __`contract/cancel`__ [contract_id, document] {_"kiesnet-id/pin"_}
+> invoke __`contract/cancel`__ [contract_id, document]
 - Cancel the contract
