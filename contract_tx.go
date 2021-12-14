@@ -234,7 +234,6 @@ func invokeCallback(stub shim.ChaincodeStubInterface, ccid string, args [][]byte
 	res := stub.InvokeChaincode(ccid, args, "")
 
 	if res.GetStatus() == 200 {
-		logger.Debug(res.GetPayload())
 		callback := base64.StdEncoding.EncodeToString(res.GetPayload())
 		return &callback, nil
 	}
