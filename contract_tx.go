@@ -225,7 +225,6 @@ func contractList(stub shim.ChaincodeStubInterface, params []string) peer.Respon
 }
 
 // helpers
-
 func invokeCallback(stub shim.ChaincodeStubInterface, ccid string, args [][]byte) error {
 	res := stub.InvokeChaincode(ccid, args, "")
 	if res.GetStatus() == 200 {
